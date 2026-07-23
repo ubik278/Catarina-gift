@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#DCC49A">
+<title>A letter for Catarina</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Permanent+Marker&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Permanent+Marker&display=swap">
+
+<style>
+:root{
+  --kraft:#DCC49A;
+  --ink:#2B2A28;
+  --orange:#F26B1D;
+  --rosso:#A85B4A;
+  --concrete:#8C8781;
+  --amarone:#5C1F26;
+  --tape:#E8DCC0;
+  --letter:#E9DCC4;
+  --paper:#F4ECD8;
+  --paper-edge:#E7DBBE;
+  --green:#4A6B3A;
+
+  --hand:'Caveat', cursive;
+  --mark:'Permanent Marker', cursive;
+  --mono:'Courier Prime', monospace;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0; height:100%;}
+body{
+  background:var(--kraft);
+  color:var(--ink);
+  font-family:var(--hand);
+  overflow:hidden;
+  position:fixed;
+  inset:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* paper grain overlay */
+.grain{
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  opacity:.07; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- book / screens ---- */
+.book{position:fixed; inset:0; overflow:hidden;}
+.screen{
+  position:absolute; inset:0;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:34px 22px 64px;
+  transform:translateX(100%) rotate(1.5deg);
+  opacity:0; pointer-events:none;
+  transition:transform .42s cubic-bezier(.42,0,.18,1), opacity .34s ease;
+  box-shadow:-22px 0 46px rgba(0,0,0,.28);
+  background:var(--kraft);
+}
+.screen.active{transform:translateX(0) rotate(0); opacity:1; pointer-events:auto; z-index:3;}
+.screen.prev{transform:translateX(-26%) rotate(-2deg); opacity:0; z-index:1;}
+
+.wrap{width:100%; max-width:430px; margin:auto;}
+
+/* page numbers */
+.pageno{
+  position:absolute; bottom:16px; right:20px;
+  font-family:var(--mark); color:var(--concrete);
+  font-size:15px; opacity:.6; transform:rotate(-6deg);
+}
+
+/* ---- masking tape ---- */
+.tape{
+  position:relative;
+  background:var(--tape);
+  opacity:.9;
+  box-shadow:0 3px 7px rgba(0,0,0,.16);
+  clip-path:polygon(2% 8%, 8% 0, 16% 7%, 26% 1%, 38% 8%, 50% 2%, 62% 8%, 74% 1%, 85% 8%, 93% 1%, 99% 9%, 98% 92%, 92% 100%, 82% 93%, 70% 99%, 58% 92%, 46% 99%, 34% 92%, 22% 99%, 12% 92%, 4% 99%, 1% 90%);
+  background-image:linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,0) 40%, rgba(0,0,0,.05));
+}
+
+/* ---- cover (screen 0) ---- */
+.cover-board{
+  width:100%; max-width:360px; margin:0 auto;
+  aspect-ratio:3/4;
+  background:
+    radial-gradient(120% 90% at 30% 10%, rgba(255,255,255,.10), rgba(0,0,0,.10) 90%),
+    var(--kraft);
+  border-radius:5px;
+  box-shadow:0 14px 30px rgba(0,0,0,.32), inset 0 0 0 1px rgba(0,0,0,.06);
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+}
+.cover-tape{
+  width:74%; padding:22px 14px; text-align:center;
+  transform:rotate(-3deg);
+  font-family:var(--mark); color:var(--ink);
+}
+.cover-tape .big{font-size:19px; letter-spacing:1px; line-height:1.25;}
+.cover-tape .sub{font-family:var(--hand); font-size:22px; margin-top:4px;}
+.cover-tape .ok{font-family:var(--hand); font-size:20px; opacity:.7; margin-top:1px;}
+.datestamp{
+  position:absolute; bottom:14px; right:16px;
+  font-family:var(--mark); color:var(--orange);
+  font-size:16px; letter-spacing:1px; transform:rotate(-2deg);
+  text-shadow:0 0 1px rgba(242,107,29,.4);
+}
+.cover-note{
+  font-family:var(--hand); font-size:20px; color:var(--ink);
+  opacity:.85; text-align:center; margin:22px auto 20px; max-width:300px; line-height:1.3;
+}
+
+/* ---- buttons ---- */
+.btn{
+  font-family:var(--mark);
+  font-size:18px; letter-spacing:.5px;
+  color:var(--paper);
+  background:var(--amarone);
+  border:none; border-radius:3px;
+  padding:13px 26px;
+  cursor:pointer;
+  box-shadow:0 5px 0 rgba(0,0,0,.22), 0 6px 12px rgba(0,0,0,.2);
+  transform:rotate(-1deg);
+  transition:transform .1s ease, box-shadow .1s ease;
+}
+.btn:active{transform:translateY(3px) rotate(-1deg); box-shadow:0 2px 0 rgba(0,0,0,.22);}
+.btn.center{display:block; margin:26px auto 0;}
+
+:focus-visible{outline:3px solid var(--orange); outline-offset:3px;}
+
+/* ---- questions ---- */
+.q-head{
+  font-family:var(--hand); font-weight:700;
+  font-size:30px; line-height:1.15; margin:0 0 22px;
+  color:var(--ink);
+}
+.q-head b{color:var(--rosso);}
+
+.options{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px;}
+.sticker{
+  display:block; width:100%; text-align:left;
+  font-family:var(--mark); font-size:16px; line-height:1.3;
+  color:var(--ink);
+  background:var(--paper);
+  border:none; border-radius:4px;
+  padding:15px 16px;
+  cursor:pointer;
+  box-shadow:0 4px 9px rgba(0,0,0,.16);
+  position:relative;
+  transition:transform .12s ease, box-shadow .12s ease;
+  transform:rotate(var(--rot,0deg));
+}
+.sticker:nth-child(1){--rot:-1.2deg;}
+.sticker:nth-child(2){--rot:.8deg;}
+.sticker:nth-child(3){--rot:-.6deg;}
+.sticker:active{transform:scale(.985) rotate(var(--rot,0deg));}
+.sticker.pop{animation:pop .34s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes pop{0%{transform:scale(.4) rotate(var(--rot)); opacity:0;}60%{transform:scale(1.06) rotate(var(--rot));}100%{transform:scale(1) rotate(var(--rot)); opacity:1;}}
+.shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97) both;}
+@keyframes shake{10%,90%{transform:translateX(-2px) rotate(var(--rot));}20%,80%{transform:translateX(4px) rotate(var(--rot));}30%,50%,70%{transform:translateX(-7px) rotate(var(--rot));}40%,60%{transform:translateX(7px) rotate(var(--rot));}}
+
+/* ---- notebook page bg for Q1 ---- */
+.notebook{
+  background:
+    linear-gradient(90deg, transparent 30px, rgba(168,91,74,.35) 30px, rgba(168,91,74,.35) 31px, transparent 31px),
+    repeating-linear-gradient(180deg, transparent 0 33px, rgba(140,135,129,.28) 33px 34px),
+    var(--paper);
+  border-radius:4px;
+  padding:26px 20px 30px 40px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+/* ---- stamps ---- */
+.stamp{
+  position:absolute;
+  font-family:var(--mark);
+  font-size:30px; letter-spacing:2px;
+  padding:4px 12px;
+  border:4px solid currentColor; border-radius:5px;
+  top:50%; left:50%;
+  opacity:0; pointer-events:none;
+  z-index:6;
+}
+.stamp.hmmm{color:var(--amarone); transform:translate(-50%,-50%) rotate(-14deg) scale(2.4);}
+.stamp.correct{color:var(--green); transform:translate(-50%,-50%) rotate(8deg) scale(2.4);}
+.stamp.drop{animation:stampdrop .28s cubic-bezier(.6,-0.28,.74,.05) forwards;}
+@keyframes stampdrop{to{opacity:.92; transform:translate(-50%,-50%) rotate(var(--sr,-12deg)) scale(1);}}
+.stamp.hmmm.drop{--sr:-14deg;}
+.stamp.correct.drop{--sr:8deg;}
+.stamp.fade{animation:stampfade .4s ease forwards;}
+@keyframes stampfade{to{opacity:0; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.3);}}
+
+.msg{
+  font-family:var(--hand); font-size:23px; color:var(--amarone);
+  text-align:center; margin:18px auto 0; min-height:30px; opacity:0;
+  transition:opacity .3s ease; max-width:320px; line-height:1.25;
+}
+.msg.show{opacity:1;}
+
+/* wrong-answer persistent stickers (Q2) */
+.snap{
+  position:absolute; top:-14px; right:-10px;
+  font-family:var(--mark); font-size:13px;
+  color:var(--paper); background:var(--concrete);
+  padding:4px 9px; border-radius:20px;
+  transform:rotate(9deg) scale(0);
+  box-shadow:0 3px 6px rgba(0,0,0,.25);
+  z-index:5;
+}
+.snap.on{animation:snapon .3s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes snapon{to{transform:rotate(9deg) scale(1);}}
+.snap.lock{background:var(--amarone);}
+
+/* ---- screen 3 photos ---- */
+.photos{display:flex; flex-direction:column; gap:22px; margin-top:6px;}
+.photo{
+  position:relative; width:100%;
+  background:var(--paper); padding:9px 9px 8px;
+  box-shadow:0 6px 16px rgba(0,0,0,.24);
+  cursor:pointer; border:none; text-align:left;
+  transition:transform .12s ease;
+}
+.photo:nth-child(1){transform:rotate(-1.8deg);}
+.photo:nth-child(2){transform:rotate(1.4deg);}
+.photo:nth-child(3){transform:rotate(-1deg);}
+.photo:active{transform:scale(.99);}
+.photo::before{
+  content:""; position:absolute; top:-13px; left:50%;
+  width:92px; height:26px; transform:translateX(-50%) rotate(-3deg);
+  background:var(--tape); opacity:.88;
+  box-shadow:0 2px 5px rgba(0,0,0,.16);
+  clip-path:polygon(3% 12%,97% 4%,99% 88%,2% 96%);
+}
+.photo svg{display:block; width:100%; height:auto; border-radius:1px;}
+.photo .cap{
+  font-family:var(--hand); font-size:20px; color:var(--ink);
+  margin-top:5px; padding:0 4px; line-height:1.15;
+}
+.q3-msg{
+  font-family:var(--hand); font-size:26px; color:var(--ink);
+  text-align:center; line-height:1.3; margin:24px auto 0;
+  max-width:330px; opacity:0; transition:opacity .5s ease;
+}
+.q3-msg.show{opacity:1;}
+.q3-msg b{color:var(--rosso); font-weight:700;}
+
+/* ---- screen 4 reveal ---- */
+.reveal-screen{justify-content:flex-start;}
+.letter-wrap{perspective:1500px; width:100%; max-width:360px; margin:14px auto 0;}
+.letter{
+  position:relative; width:100%;
+  transform-style:preserve-3d;
+}
+/* tape holding the folded letter down */
+.letter::before, .letter::after{
+  content:""; position:absolute; top:-11px; width:88px; height:26px;
+  background:var(--tape); opacity:.88; z-index:8;
+  box-shadow:0 2px 6px rgba(0,0,0,.16);
+  clip-path:polygon(4% 14%,96% 3%,99% 86%,2% 97%);
+}
+.letter::before{left:14px; transform:rotate(-4deg);}
+.letter::after{right:14px; transform:rotate(3deg);}
+.letter-face{
+  position:relative;
+  background:var(--paper);
+  border-radius:3px;
+  box-shadow:5px 13px 28px rgba(0,0,0,.30);
+  padding:22px 16px 24px;
+  display:flex; flex-direction:column; gap:14px;
+  overflow:hidden;
+  min-height:220px;
+}
+.letter-face .to{font-family:var(--hand); font-size:24px; color:var(--ink);}
+.flap{
+  position:absolute; left:0; width:100%; height:50%;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,0) 30%),
+    var(--letter);
+  backface-visibility:hidden;
+  z-index:4;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.06);
+}
+.flap-top{top:0; transform-origin:bottom center; box-shadow:inset 0 -12px 20px rgba(0,0,0,.10);}
+.flap-bottom{bottom:0; transform-origin:top center; box-shadow:inset 0 12px 20px rgba(0,0,0,.10);}
+.flap-addr{
+  position:absolute; bottom:16px; left:0; width:100%;
+  text-align:center; font-family:var(--hand); font-size:26px; color:var(--ink);
+}
+.letter.opening .flap-top{transition:transform .55s cubic-bezier(.5,0,.2,1); transform:rotateX(-172deg);}
+.letter.opening .flap-bottom{transition:transform .55s cubic-bezier(.5,0,.2,1) .38s; transform:rotateX(172deg);}
+.letter.reduced .flap{transition:opacity .3s ease; opacity:0; pointer-events:none;}
+
+/* wax seal */
+.seal{
+  position:absolute; top:50%; left:50%;
+  width:74px; height:74px; margin:-37px 0 0 -37px;
+  z-index:7; border:none; background:none; padding:0; cursor:pointer;
+}
+.seal-half{
+  position:absolute; top:0; width:37px; height:74px; overflow:hidden;
+}
+.seal-half .disc{
+  position:absolute; top:0; width:74px; height:74px; border-radius:50%;
+  background:radial-gradient(circle at 38% 34%, #7a2b32, var(--amarone) 60%, #430f15);
+  box-shadow:0 3px 7px rgba(0,0,0,.4), inset 0 -4px 8px rgba(0,0,0,.4), inset 0 3px 6px rgba(255,255,255,.12);
+}
+.seal-half.left{left:0;}
+.seal-half.left .disc{left:0;}
+.seal-half.right{right:0;}
+.seal-half.right .disc{right:0;}
+.seal-V{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-52%);
+  font-family:var(--hand); font-weight:700; font-size:40px; color:#3a0d12;
+  z-index:8; pointer-events:none; text-shadow:0 1px 0 rgba(255,255,255,.12);
+}
+.seal.cracked .left{animation:crackL .5s cubic-bezier(.4,0,.5,1) forwards;}
+.seal.cracked .right{animation:crackR .5s cubic-bezier(.4,0,.5,1) forwards;}
+.seal.cracked .seal-V{animation:stampfadeout .25s ease forwards;}
+@keyframes stampfadeout{to{opacity:0;}}
+@keyframes crackL{to{transform:translate(-7px,8px) rotate(-22deg); opacity:.85;}}
+@keyframes crackR{to{transform:translate(7px,8px) rotate(22deg); opacity:.85;}}
+.crumb{
+  position:absolute; top:50%; left:50%; width:5px; height:5px; border-radius:50%;
+  background:var(--amarone); z-index:6; opacity:0;
+}
+
+/* hold slip */
+.slip{
+  font-family:var(--mono); font-size:12px; line-height:1.55;
+  color:var(--ink);
+  background:#fbf6ea;
+  border-top:2px dashed var(--concrete);
+  border-bottom:2px dashed var(--concrete);
+  padding:12px 10px; margin-top:4px;
+  white-space:pre; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  letter-spacing:-.2px;
+}
+.hand-note{font-family:var(--hand); font-size:19px; line-height:1.25; color:var(--ink); opacity:.9;}
+
+/* after-letter block */
+.after{margin:30px auto 0; width:100%; max-width:380px; opacity:0; transform:translateY(14px);
+  transition:opacity .5s ease, transform .5s ease; pointer-events:none;}
+.after.show{opacity:1; transform:none; pointer-events:auto;}
+.ask{font-family:var(--hand); font-size:26px; text-align:center; color:var(--ink); margin:0 0 14px;}
+.slips{display:flex; gap:14px; justify-content:center;}
+.resv{
+  flex:1; position:relative;
+  font-family:var(--mono); font-weight:700; font-size:15px;
+  color:var(--ink); background:#fbf6ea;
+  border:1px dashed var(--concrete); border-radius:2px;
+  padding:22px 6px; cursor:pointer; text-align:center;
+  box-shadow:0 4px 10px rgba(0,0,0,.16);
+  transition:transform .12s ease;
+}
+.resv:nth-child(1){transform:rotate(-1.5deg);}
+.resv:nth-child(2){transform:rotate(1.5deg);}
+.resv small{display:block; font-family:var(--mono); font-weight:400; font-size:10px; opacity:.6; margin-top:6px; letter-spacing:0;}
+.resv:active{transform:scale(.98);}
+.resv .cancel{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%) rotate(-12deg) scale(2.4);
+  font-family:var(--mark); font-size:19px; letter-spacing:1px;
+  color:var(--amarone); border:3px solid var(--amarone); border-radius:4px;
+  padding:2px 7px; opacity:0; pointer-events:none;
+}
+.resv .cancel.drop{animation:stampdrop .28s cubic-bezier(.6,-0.28,.74,.05) forwards; --sr:-12deg;}
+.resv.kept{box-shadow:0 0 0 2px var(--green), 0 4px 10px rgba(0,0,0,.16);}
+.resv-done{font-family:var(--hand); font-size:21px; text-align:center; color:var(--ink); margin:14px auto 0; opacity:0; transition:opacity .4s ease;}
+.resv-done.show{opacity:1;}
+
+/* coupons */
+.coupons{margin-top:26px; display:flex; flex-direction:column; gap:14px; opacity:0; transition:opacity .5s ease;}
+.coupons.show{opacity:1;}
+.coupon{
+  font-family:var(--mono); font-size:13px; line-height:1.35;
+  color:var(--ink); background:#fbf6ea;
+  padding:16px 14px 14px; border-radius:2px;
+  box-shadow:0 4px 9px rgba(0,0,0,.15);
+  position:relative;
+  border:1px solid rgba(140,135,129,.4);
+}
+.coupon::before{
+  content:""; position:absolute; top:-1px; left:0; width:100%; height:8px;
+  background:radial-gradient(circle at 6px 0, transparent 5px, var(--kraft) 5px) repeat-x;
+  background-size:12px 8px;
+}
+.coupon b{display:block; font-family:var(--mark); font-weight:400; font-size:13px; color:var(--rosso); margin-bottom:3px; letter-spacing:.5px;}
+
+/* ---- screen 5 ---- */
+.quiet{background:var(--kraft);}
+.quiet .wrap{max-width:400px;}
+.q5-sec{margin:0 0 24px;}
+.q5-h{font-family:var(--hand); font-weight:700; font-size:27px; color:var(--ink); margin:0 0 6px; line-height:1.1;}
+.q5-list{font-family:var(--mono); font-size:13px; line-height:1.75; color:var(--ink);}
+.q5-list .row{margin:0;}
+.q5-tag{font-family:var(--hand); font-size:17px; color:var(--concrete);}
+.q5-why{font-family:var(--mono); font-size:13px; line-height:1.7; color:var(--ink);}
+.signoff{font-family:var(--hand); font-size:26px; color:var(--ink); margin:30px 0 22px; line-height:1.3;}
+.again{
+  display:inline-block; font-family:var(--hand); font-size:17px;
+  color:var(--concrete); opacity:.65; background:none; border:none;
+  cursor:pointer; text-decoration:underline; padding:6px 2px;
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce){
+  .screen{transition:opacity .18s ease; transform:none !important; box-shadow:none;}
+  .screen.prev{opacity:0;}
+  .sticker.pop{animation:none;}
+  .stamp.drop{animation:none; opacity:.92; transform:translate(-50%,-50%) rotate(var(--sr,-12deg)) scale(1);}
+  .shake{animation:none;}
+  .snap.on{animation:none; transform:rotate(9deg) scale(1);}
+  .seal.cracked .left,.seal.cracked .right{animation:none; opacity:0;}
+  .letter.opening .flap-top,.letter.opening .flap-bottom{transition:opacity .2s; opacity:0; transform:none;}
+  .resv .cancel.drop{animation:none; opacity:.92; transform:translate(-50%,-50%) rotate(-12deg) scale(1);}
+  .btn{transition:none;}
+  * {scroll-behavior:auto !important;}
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="book" id="book">
+
+  <!-- ===== Screen 0 — Cover ===== -->
+  <section class="screen" id="s0" aria-label="Cover">
+    <div class="wrap" style="text-align:center;">
+      <div class="cover-board">
+        <div class="tape cover-tape">
+          <div class="big">PROPERTY OF<br>CATARINA</div>
+          <div class="sub">do not open</div>
+          <div class="ok">(ok. open it.)</div>
+        </div>
+        <div class="datestamp" aria-label="date stamp">23&nbsp;·&nbsp;07&nbsp;·&nbsp;'26</div>
+      </div>
+      <p class="cover-note">Three questions.<br>There are wrong answers.</p>
+      <button class="btn" data-go="1">Open it</button>
+    </div>
+    <span class="pageno">1</span>
+  </section>
+
+  <!-- ===== Screen 1 — Question one ===== -->
+  <section class="screen" id="s1" aria-label="Question one">
+    <div class="wrap">
+      <div class="notebook">
+        <h1 class="q-head"><b>One.</b> What actually makes a good present?</h1>
+        <ul class="options" id="q1opts">
+          <li><button class="sticker" data-correct="0">Something I can put on a shelf</button></li>
+          <li><button class="sticker" data-correct="1">Something I'll still be telling people about in ten years</button></li>
+          <li><button class="sticker" data-correct="0">Something practical. An Apple Watch, say.</button></li>
+        </ul>
+      </div>
+      <p class="msg" id="q1msg"></p>
+    </div>
+    <div class="stamp hmmm" id="q1stamp-w">HMMM</div>
+    <div class="stamp correct" id="q1stamp-c">CORRECT</div>
+    <span class="pageno">2</span>
+  </section>
+
+  <!-- ===== Screen 2 — Question two ===== -->
+  <section class="screen" id="s2" aria-label="Question two">
+    <div class="wrap">
+      <div class="notebook">
+        <h1 class="q-head"><b>Two.</b> Pick the evening you'd actually want.</h1>
+        <ul class="options" id="q2opts">
+          <li><button class="sticker" data-kind="water" data-correct="0">Waterpark hotel. Slides. Wristbands. Chlorine.<span class="snap" data-snap="water">WRISTBAND</span></button></li>
+          <li><button class="sticker" data-kind="escape" data-correct="0">Escape room. Ninety minutes. A padlock. A countdown.<span class="snap lock" data-snap="escape">🔒 LOCKED</span></button></li>
+          <li><button class="sticker" data-correct="1">Risotto cooked in the wine, in the valley that makes the wine.</button></li>
+        </ul>
+      </div>
+      <p class="msg" id="q2msg"></p>
+    </div>
+    <div class="stamp correct" id="q2stamp-c">CORRECT</div>
+    <span class="pageno">3</span>
+  </section>
+
+  <!-- ===== Screen 3 — Question three (the turn) ===== -->
+  <section class="screen" id="s3" aria-label="Question three">
+    <div class="wrap">
+      <h1 class="q-head"><b>Three.</b> Which one do you want to stand inside?</h1>
+      <div class="photos" id="q3opts">
+        <button class="photo" data-p="1">
+          <svg viewBox="0 0 300 200" role="img" aria-label="A stone rider on a raw concrete plinth, cut loose from the wall">
+            <rect width="300" height="200" fill="#e9ddc2"/>
+            <g fill="none" stroke="#2B2A28" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <!-- medieval brick wall behind -->
+              <path d="M18 34 H282 M18 60 H282 M18 86 H282" stroke="#A85B4A" stroke-width="1" opacity=".45"/>
+              <path d="M60 34 V60 M120 34 V60 M180 34 V60 M240 34 V60 M90 60 V86 M150 60 V86 M210 60 V86" stroke="#A85B4A" stroke-width="1" opacity=".45"/>
+              <!-- cantilevered concrete plinth: one support at left, slab floating right -->
+              <path d="M84 150 L232 143 L232 159 L84 158 Z" fill="#8C8781" stroke="#2B2A28"/>
+              <path d="M96 158 L116 158 L114 190 L100 190 Z" fill="#8C8781" stroke="#2B2A28"/>
+              <path d="M150 145 L150 158" stroke="#2B2A28" stroke-width="1.2" opacity=".55"/>
+              <!-- equestrian statue silhouette, facing left, built from primitives -->
+              <path d="M142 127 L140 150 M155 128 L156 150 M173 128 L174 150 M185 127 L187 150" stroke="#2B2A28" stroke-width="5"/>
+              <g fill="#2B2A28" stroke="none">
+                <ellipse cx="163" cy="116" rx="37" ry="13"/>
+                <path d="M196 110 C205 112 207 127 198 141 C197 132 195 123 189 119 Z"/>
+                <!-- neck + head -->
+                <path d="M128 116 L140 119 L129 97 L117 101 Z"/>
+                <path d="M118 101 C111 95 104 96 102 102 C101 106 106 109 112 107 C115 106 117 104 118 102 Z"/>
+                <path d="M121 99 L123 92 L127 100 Z"/>
+                <!-- rider -->
+                <path d="M152 105 C149 94 153 85 159 84 C165 85 165 94 162 105 Z"/>
+                <circle cx="159" cy="80" r="6"/>
+                <path d="M156 92 L146 99" stroke="#2B2A28" stroke-width="3.5" stroke-linecap="round"/>
+              </g>
+            </g>
+          </svg>
+          <div class="cap">the rider, cut loose from the wall</div>
+        </button>
+        <button class="photo" data-p="2">
+          <svg viewBox="0 0 300 200" role="img" aria-label="A Roman amphitheatre of pink marble, open to the sky">
+            <rect width="300" height="200" fill="#efe6cf"/>
+            <g fill="none" stroke="#2B2A28" stroke-width="2.2" stroke-linejoin="round">
+              <!-- sky scribble -->
+              <path d="M30 26 q18 8 36 0 M90 22 q18 8 36 0 M150 26 q18 8 36 0 M210 22 q18 8 36 0" stroke="#8C8781" stroke-width="1" opacity=".5"/>
+              <!-- ellipse arena -->
+              <ellipse cx="150" cy="120" rx="120" ry="58" fill="#A85B4A" fill-opacity=".18"/>
+              <ellipse cx="150" cy="120" rx="120" ry="58"/>
+              <ellipse cx="150" cy="120" rx="78" ry="34" fill="#efe6cf"/>
+              <!-- arches lower tier -->
+              <g stroke-width="1.8">
+                <path d="M40 96 q6-14 12 0 M64 88 q6-14 12 0 M92 82 q6-14 12 0 M124 79 q6-14 12 0 M158 79 q6-14 12 0 M190 82 q6-14 12 0 M218 88 q6-14 12 0 M242 96 q6-14 12 0"/>
+              </g>
+            </g>
+          </svg>
+          <div class="cap">pink marble, open to the sky</div>
+        </button>
+        <button class="photo" data-p="3">
+          <svg viewBox="0 0 300 200" role="img" aria-label="A market square that has been a market since it was a Roman forum">
+            <rect width="300" height="200" fill="#ece2c8"/>
+            <g fill="none" stroke="#2B2A28" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+              <!-- tall buildings -->
+              <path d="M24 40 H86 V150 H24 Z" />
+              <path d="M30 54 h10 v12 h-10 z M56 54 h10 v12 h-10 z M30 82 h10 v12 h-10 z M56 82 h10 v12 h-10 z"/>
+              <path d="M214 34 H276 V150 H214 Z"/>
+              <path d="M222 50 h10 v12 h-10 z M250 50 h10 v12 h-10 z M222 80 h10 v12 h-10 z M250 80 h10 v12 h-10 z"/>
+              <!-- column with figure -->
+              <path d="M150 40 V96 M143 100 h14"/>
+              <circle cx="150" cy="34" r="7" fill="#A85B4A" fill-opacity=".3"/>
+              <!-- market umbrellas -->
+              <path d="M96 132 q18-20 36 0 Z" fill="#A85B4A" fill-opacity=".25"/>
+              <path d="M114 132 V158"/>
+              <path d="M150 138 q18-20 36 0 Z" fill="#F26B1D" fill-opacity=".22"/>
+              <path d="M168 138 V162"/>
+              <!-- ground -->
+              <path d="M14 172 H286" stroke-width="1.6"/>
+            </g>
+          </svg>
+          <div class="cap">a market since it was a forum</div>
+        </button>
+      </div>
+      <p class="q3-msg" id="q3msg">Good news. <b>Same city. All three.</b><br>Fifteen minutes apart, on foot.</p>
+    </div>
+    <span class="pageno">4</span>
+  </section>
+
+  <!-- ===== Screen 4 — The reveal ===== -->
+  <section class="screen reveal-screen" id="s4" aria-label="The letter">
+    <div class="wrap">
+      <div class="letter-wrap">
+        <div class="letter" id="letter">
+          <div class="letter-face" aria-hidden="false">
+            <div class="to">Catarina —</div>
+            <div class="slip" id="holdslip">PORTO (OPO) ─────▶ VERONA (VRN)
+NAMES     CATARINA / STEFAN
+WHEN      October or November 2026
+STATUS    held, not booked</div>
+            <div class="hand-note">Nothing's booked. On purpose.<br>Everything else is decided.</div>
+          </div>
+          <div class="flap flap-top" aria-hidden="true"></div>
+          <div class="flap flap-bottom" aria-hidden="true">
+            <div class="flap-addr">Catarina</div>
+          </div>
+          <button class="seal" id="seal" aria-label="A wax seal. Tap to open the letter.">
+            <span class="seal-half left"><span class="disc"></span></span>
+            <span class="seal-half right"><span class="disc"></span></span>
+            <span class="seal-V">V</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="after" id="after">
+        <p class="ask">Which one do I keep?</p>
+        <div class="slips" id="resvSlips">
+          <button class="resv" data-r="2">TAVOLO PER 2<small>booked · S. Markiewicz</small><span class="cancel">CANCELLED</span></button>
+          <button class="resv" data-r="4">TAVOLO PER 4<small>booked · S. Markiewicz</small><span class="cancel">CANCELLED</span></button>
+        </div>
+        <p class="resv-done" id="resvDone">I'll cancel the other one.</p>
+
+        <div class="coupons" id="coupons" aria-hidden="true">
+          <div class="coupon"><b>Coupon</b>One 30-minute foot massage.</div>
+          <div class="coupon"><b>Coupon</b>One extra day, if you want it.</div>
+        </div>
+
+        <button class="btn center" id="moreBtn" data-go="5" style="display:none;">There's more</button>
+      </div>
+    </div>
+    <span class="pageno">5</span>
+  </section>
+
+  <!-- ===== Screen 5 — What I was thinking ===== -->
+  <section class="screen quiet" id="s5" aria-label="What I was thinking">
+    <div class="wrap">
+      <div class="q5-sec">
+        <h2 class="q5-h">Why then</h2>
+        <p class="q5-why">The city empties out. The food turns to cold-weather food. And the Amarone in the risotto is drying on wooden racks twenty minutes away while we eat it — that only happens between October and December.</p>
+      </div>
+
+      <div class="q5-sec">
+        <h2 class="q5-h">Buildings</h2>
+        <div class="q5-list">
+          <p class="row">— Castelvecchio. Scarpa cut the castle open and left the cuts showing.</p>
+          <p class="row">— Banca Popolare, Piazza Nogara. His last building. Ten minutes' walk, still a working bank, so we look from outside. Roman crushed-ceramic plaster on a 1970s façade.</p>
+          <p class="row">— San Zeno Maggiore. Romanesque. The bronze doors are the thing.</p>
+          <p class="row">— San Fermo Maggiore. Two churches stacked on top of each other.</p>
+          <p class="row">— Porta Borsari and Ponte Pietra. Roman, standing in the street, no ticket.</p>
+          <p class="row">— Palazzo Bevilacqua, Corso Cavour. Sanmicheli. On the way to everything else.</p>
+          <p class="row">— Giardino Giusti. Renaissance garden, cypresses, a hedge maze. <span class="q5-tag">(if there are four of us, this first)</span></p>
+        </div>
+      </div>
+
+      <div class="q5-sec">
+        <h2 class="q5-h">Three museums</h2>
+        <div class="q5-list">
+          <p class="row">— Museo di Castelvecchio. The Cangrande on its concrete plinth. The reason we're going.</p>
+          <p class="row">— Palazzo Maffei. A stone spiral staircase that runs cellar to roof holding itself up. Rooftop over Piazza delle Erbe.</p>
+          <p class="row">— Museo Archeologico al Teatro Romano. A Roman theatre cut into the hill, a monastery above it, and the best view of the city.</p>
+        </div>
+      </div>
+
+      <div class="q5-sec">
+        <h2 class="q5-h">Where to eat</h2>
+        <div class="q5-list">
+          <p class="row">— Antica Bottega del Vino. Risotto all'Amarone and a wine list from another century. Book this one.</p>
+          <p class="row">— Trattoria Al Bersagliere. Bollito con la pearà in a 13th-century cellar.</p>
+          <p class="row">— Ostregheteria Sottoriva 23. Under the medieval porticoes on the best street in the city. Small plates, no booking.</p>
+          <p class="row">— Trattoria al Pompiere. The cured meat counter, then the tiramisu.</p>
+          <p class="row">— Osteria del Bugiardo. A glass of Valpolicella standing up, between things.</p>
+          <p class="row">— Greppia. Family-run, home cooking, bigoli with duck ragù. <span class="q5-tag">(if there are four of us, this one)</span></p>
+        </div>
+      </div>
+
+      <div class="q5-sec">
+        <h2 class="q5-h">Not planned</h2>
+        <p class="q5-why">One afternoon. Deliberately.</p>
+      </div>
+
+      <p class="signoff">Italy was the first place we went together. Then it was every year. Now the kids know it too.<br>It’s just further now.</p>
+      <button class="again" data-go="0">read it again</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  var current = 0;
+  var busy = false;
+
+  function show(n){
+    if(n === current) return;
+    var from = screens[current];
+    var to = screens[n];
+    // reset incoming to the right, ready to slide in
+    to.classList.remove('prev');
+    if(!reduced){
+      to.style.transition = 'none';
+      to.style.transform = 'translateX(100%) rotate(1.5deg)';
+      to.style.opacity = '0';
+      // force reflow
+      void to.offsetWidth;
+      to.style.transition = '';
+    }
+    to.style.transform = '';
+    to.style.opacity = '';
+    to.classList.add('active');
+    from.classList.remove('active');
+    from.classList.add('prev');
+    to.scrollTop = 0;
+    current = n;
+    // move focus to the new screen for keyboard users
+    var focusTarget = to.querySelector('button, [tabindex]');
+    if(focusTarget){ try{ focusTarget.focus({preventScroll:true}); }catch(e){ focusTarget.focus(); } }
+  }
+
+  // generic "go" buttons
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = parseInt(b.getAttribute('data-go'),10);
+      if(t === 0){ resetAll(); }
+      show(t);
+    });
+  });
+
+  function dropStamp(stamp, cb, delay){
+    stamp.classList.remove('fade');
+    stamp.classList.add('drop');
+    if(cb){ setTimeout(cb, delay || 700); }
+  }
+
+  /* ---------- Question 1 ---------- */
+  var q1msg = document.getElementById('q1msg');
+  var q1sW = document.getElementById('q1stamp-w');
+  var q1sC = document.getElementById('q1stamp-c');
+  document.querySelectorAll('#q1opts .sticker').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(busy) return; busy = true;
+      var correct = btn.getAttribute('data-correct') === '1';
+      if(correct){
+        dropStamp(q1sC, function(){ busy=false; show(2); }, reduced?300:820);
+      }else{
+        btn.classList.add('shake');
+        setTimeout(function(){ btn.classList.remove('shake'); }, 450);
+        dropStamp(q1sW);
+        q1msg.textContent = 'No. I’ve met you.';
+        q1msg.classList.add('show');
+        setTimeout(function(){
+          q1sW.classList.remove('drop'); q1sW.classList.add('fade');
+          q1msg.classList.remove('show');
+          busy = false;
+        }, 1500);
+      }
+    });
+  });
+
+  /* ---------- Question 2 ---------- */
+  var q2msg = document.getElementById('q2msg');
+  var q2sC = document.getElementById('q2stamp-c');
+  document.querySelectorAll('#q2opts .sticker').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(busy) return; busy = true;
+      var correct = btn.getAttribute('data-correct') === '1';
+      if(correct){
+        dropStamp(q2sC, function(){ busy=false; show(3); }, reduced?300:820);
+      }else{
+        var kind = btn.getAttribute('data-kind');
+        btn.classList.add('shake');
+        setTimeout(function(){ btn.classList.remove('shake'); }, 450);
+        var snap = btn.querySelector('.snap');
+        if(snap){ snap.classList.add('on'); }
+        if(kind === 'water'){ q2msg.textContent = 'Wrong. But I’ll keep it in mind.'; }
+        else { q2msg.textContent = 'Absolutely not. Noted, permanently.'; }
+        q2msg.classList.add('show');
+        setTimeout(function(){
+          q2msg.classList.remove('show');
+          busy = false;
+        }, 1800);
+      }
+    });
+  });
+
+  /* ---------- Question 3 (all correct) ---------- */
+  var q3msg = document.getElementById('q3msg');
+  document.querySelectorAll('#q3opts .photo').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(busy) return; busy = true;
+      document.querySelectorAll('#q3opts .photo').forEach(function(p){ p.disabled = true; p.style.opacity = (p===btn)?'1':'.55'; });
+      q3msg.classList.add('show');
+      q3msg.scrollIntoView({behavior: reduced?'auto':'smooth', block:'center'});
+      setTimeout(function(){ busy=false; show(4); }, reduced?900:2200);
+    });
+  });
+
+  /* ---------- Screen 4: the seal ---------- */
+  var seal = document.getElementById('seal');
+  var letter = document.getElementById('letter');
+  var after = document.getElementById('after');
+  var sealDone = false;
+  var s4 = document.getElementById('s4');
+
+  function spawnCrumbs(){
+    if(reduced) return;
+    var wrap = letter;
+    for(var i=0;i<7;i++){
+      (function(i){
+        var c = document.createElement('span');
+        c.className = 'crumb';
+        letter.querySelector('.letter-face').appendChild(c);
+        var ang = (Math.PI * (i/6)) + Math.PI*0.15;
+        var dx = Math.cos(ang) * (30 + i*4) * (i%2?1:-1);
+        var dy = 20 + i*6;
+        c.animate([
+          {transform:'translate(-50%,-50%) scale(1)', opacity:1},
+          {transform:'translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px)) scale(.4)', opacity:0}
+        ], {duration:600 + i*40, easing:'cubic-bezier(.3,.7,.4,1)', fill:'forwards'});
+        setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); }, 900);
+      })(i);
+    }
+  }
+
+  seal.addEventListener('click', function(){
+    if(sealDone) return; sealDone = true;
+    if(reduced){
+      seal.style.opacity = '0'; seal.style.pointerEvents='none';
+      letter.classList.add('reduced');
+      revealAfter();
+      return;
+    }
+    seal.classList.add('cracked');
+    spawnCrumbs();
+    setTimeout(function(){ seal.style.opacity='0'; seal.style.pointerEvents='none'; }, 460);
+    setTimeout(function(){ letter.classList.add('opening'); }, 260);
+    // after both flaps have unfolded
+    setTimeout(revealAfter, 1250);
+  });
+
+  function revealAfter(){
+    after.classList.add('show');
+    after.querySelector('.ask').scrollIntoView({behavior: reduced?'auto':'smooth', block:'center'});
+    var first = after.querySelector('.resv');
+    if(first){ try{ first.focus({preventScroll:true}); }catch(e){} }
+  }
+
+  /* reservation choice — the one real question */
+  var resvDone = document.getElementById('resvDone');
+  var coupons = document.getElementById('coupons');
+  var moreBtn = document.getElementById('moreBtn');
+  var chosen = false;
+  document.querySelectorAll('#resvSlips .resv').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(chosen) return; chosen = true;
+      btn.classList.add('kept');
+      document.querySelectorAll('#resvSlips .resv').forEach(function(o){
+        if(o !== btn){
+          var stamp = o.querySelector('.cancel');
+          stamp.classList.add('drop');
+          o.setAttribute('aria-disabled','true');
+        }
+      });
+      setTimeout(function(){ resvDone.classList.add('show'); }, reduced?0:350);
+      setTimeout(function(){
+        coupons.classList.add('show');
+        coupons.setAttribute('aria-hidden','false');
+        moreBtn.style.display = 'block';
+        moreBtn.scrollIntoView({behavior: reduced?'auto':'smooth', block:'center'});
+      }, reduced?200:900);
+    });
+  });
+
+  /* ---------- reset (read it again) ---------- */
+  function resetAll(){
+    busy = false; sealDone = false; chosen = false;
+    // Q1
+    q1msg.classList.remove('show'); q1msg.textContent='';
+    q1sW.className='stamp hmmm'; q1sC.className='stamp correct';
+    // Q2
+    q2msg.classList.remove('show'); q2msg.textContent='';
+    q2sC.className='stamp correct';
+    document.querySelectorAll('#q2opts .snap').forEach(function(s){ s.classList.remove('on'); });
+    // Q3
+    q3msg.classList.remove('show');
+    document.querySelectorAll('#q3opts .photo').forEach(function(p){ p.disabled=false; p.style.opacity=''; });
+    // Q4
+    seal.className='seal'; seal.style.opacity=''; seal.style.pointerEvents='';
+    letter.className='letter';
+    after.classList.remove('show');
+    resvDone.classList.remove('show');
+    coupons.classList.remove('show'); coupons.setAttribute('aria-hidden','true');
+    moreBtn.style.display='none';
+    document.querySelectorAll('#resvSlips .resv').forEach(function(o){
+      o.classList.remove('kept'); o.removeAttribute('aria-disabled');
+      var st=o.querySelector('.cancel'); st.className='cancel';
+    });
+  }
+
+  // start
+  screens[0].classList.add('active');
+})();
+</script>
+</body>
+</html>
