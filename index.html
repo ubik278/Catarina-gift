@@ -87,19 +87,31 @@ body{
 
 /* ---- cover (screen 0) ---- */
 .cover-board{
-  width:100%; max-width:360px; margin:0 auto;
-  aspect-ratio:3/4;
+  width:100%; max-width:340px; margin:0 auto;
   background:
     radial-gradient(120% 90% at 30% 10%, rgba(255,255,255,.10), rgba(0,0,0,.10) 90%),
     var(--kraft);
   border-radius:5px;
   box-shadow:0 14px 30px rgba(0,0,0,.32), inset 0 0 0 1px rgba(0,0,0,.06);
   position:relative;
-  display:flex; align-items:center; justify-content:center;
+  padding:18px 16px 46px;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+}
+.cover-photo{
+  position:relative; z-index:1;
+  transform:rotate(2deg);
+  filter:drop-shadow(2px 5px 5px rgba(0,0,0,.30));
+  margin-bottom:2px;
+}
+.cover-photo img{
+  display:block; width:auto;
+  height:44vh; max-height:430px; min-height:220px;
 }
 .cover-tape{
-  width:74%; padding:22px 14px; text-align:center;
+  position:relative; z-index:2;
+  width:82%; padding:16px 14px 14px; text-align:center;
   transform:rotate(-3deg);
+  margin-top:-4px;
   font-family:var(--mark); color:var(--ink);
 }
 .cover-tape .big{font-size:19px; letter-spacing:1px; line-height:1.25;}
@@ -433,6 +445,9 @@ body{
   <section class="screen" id="s0" aria-label="Cover">
     <div class="wrap" style="text-align:center;">
       <div class="cover-board">
+        <div class="cover-photo">
+          <img src="catarina.png" alt="Catarina, grinning, throwing two peace signs in a white robe" width="640" height="1152">
+        </div>
         <div class="tape cover-tape">
           <div class="big">PROPERTY OF<br>CATARINA</div>
           <div class="sub">do not open</div>
